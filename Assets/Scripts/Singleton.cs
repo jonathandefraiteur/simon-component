@@ -61,6 +61,11 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             }
         }
     }
+    
+    public static bool HasInstance()
+    {
+        return _instance != null;
+    }
 
     private static bool applicationIsQuitting = false;
     /// <summary>

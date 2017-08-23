@@ -1,16 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEditor;
 
-public class SimonPlayerEditor : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+namespace SimonComponent
+{
+	[CustomEditor(typeof(SimonPlayer))]
+	// [CanEditMultipleObjects]
+	public class SimonPlayerEditor : Editor
+	{
+		public override void OnInspectorGUI()
+		{
+			
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+			DrawDefaultInspector();
+		}
 	}
 }

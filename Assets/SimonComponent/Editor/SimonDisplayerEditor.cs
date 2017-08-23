@@ -12,16 +12,22 @@ namespace SimonComponent
             SimonDisplayer script = (SimonDisplayer) target;
 
             // Simon Player
-            script.SimonPlayer = (SimonPlayer) EditorGUILayout.ObjectField(new GUIContent("Simon Player"), script.SimonPlayer, typeof(SimonPlayer), true);
+            script.SimonPlayer = (SimonPlayer) EditorGUILayout.ObjectField(new GUIContent("Simon Player"), (!script.ListenFromManager ? script.SimonPlayer : null), typeof(SimonPlayer), true);
             
             // If there is no Simon player linked
-            if (script.SimonPlayer == null)
+            if (script.SimonPlayer == null && FindObjectOfType<SimonManager>() == null)
             {
-                EditorGUILayout.HelpBox("Require a SimonPlayer linked", MessageType.Warning, true);
+                EditorGUILayout.HelpBox("Require a SimonPlayer linked or a SimonManager in the scene.", MessageType.Warning, true);
             }
             // Else display more options
             else
             {
+                // Due of the runing in Editor, the Instance is not necessarily set, so force it by the call of the property
+                if (SimonManager.Instance == null) { return; }
+
+                if (script.ListenFromManager)
+                    EditorGUILayout.HelpBox("Listening from the SimonManager in the scene.", MessageType.None, true);
+                
                 EditorGUILayout.Separator();
                 
                 // State listened

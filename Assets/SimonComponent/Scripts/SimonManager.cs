@@ -10,7 +10,7 @@ namespace SimonComponent
     public class SimonManager : Singleton<SimonManager>
     {
         protected SimonManager() {} // guarantee this will be always a singleton only - can't use the constructor!
-
+        
         public static SimonPlayer Player
         {
             get
@@ -19,6 +19,12 @@ namespace SimonComponent
                 if (player == null) throw new Exception("SimonManager object doesn't have SimonPlayer component on it.");
                 return player;
             }
+        }
+
+        private void Awake()
+        {
+            // Make the instance linked
+            var i = SimonManager.Instance;
         }
     }
 }
