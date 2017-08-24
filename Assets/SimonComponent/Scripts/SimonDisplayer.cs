@@ -27,22 +27,22 @@ namespace SimonComponent
 		public bool ListenFromManager {get { return _sPlayer == null && SimonManager.HasInstance(); }}
 
 		[SerializeField]
-		private string _listenedState;
-		public string ListenedState
+		private string _listenedSymbol;
+		public string ListenedSymbol
 		{
-			get { return _listenedState; }
+			get { return _listenedSymbol; }
 			set
 			{
-				var index = SimonPlayer.GetStateIndex(value);
-				// If the state doesn't not exist, do nothing
+				var index = SimonPlayer.GetSymbolIndex(value);
+				// If the symbol doesn't not exist, do nothing
 				if (index == -1) return;
 				// Else, set the value
-				_listenedState = value;
-				_listenedStateIndex = index;
+				_listenedSymbol = value;
+				_listenedSymbolIndex = index;
 			}
 		}
-		private int _listenedStateIndex;
-		public int ListenedStateIndex {get { return _listenedStateIndex; }}
+		private int _listenedSymbolIndex;
+		public int ListenedSymbolIndex {get { return _listenedSymbolIndex; }}
 		
 		void Start ()
 		{

@@ -198,11 +198,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec39f147935df1645833fc1f6970fa3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _states:
+  _symbols:
   - Up
   - Left
   - Right
   - Down
+  _speed: 1
+  _sequence: 
+  _positionInSequence: -1
+  _symbolSend: -1
 --- !u!4 &132535134
 Transform:
   m_ObjectHideFlags: 0
@@ -690,7 +694,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sPlayer: {fileID: 0}
-  _listenedState: Red
+  _listenedSymbol: 
 --- !u!4 &632428514
 Transform:
   m_ObjectHideFlags: 0
