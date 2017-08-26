@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using SimonComponent.ActionScripts;
+using UnityEngine;
 using UnityEditor;
 
 namespace SimonComponent
@@ -7,6 +11,8 @@ namespace SimonComponent
     // [CanEditMultipleObjects]
     public class SimonDisplayerEditor : Editor
     {
+        private int indexPopupAddDAS = 0;
+        
         public override void OnInspectorGUI()
         {
             SimonDisplayer script = (SimonDisplayer) target;
@@ -31,8 +37,6 @@ namespace SimonComponent
             {
                 if (script.ListenFromManager)
                     EditorGUILayout.HelpBox("Listening from the SimonManager in the scene", MessageType.None, true);
-                
-                EditorGUILayout.Separator();
                 
                 // Symbol listened
                 EditorGUILayout.BeginHorizontal();
@@ -59,7 +63,50 @@ namespace SimonComponent
                     script.ListenedSymbol = script.SimonPlayer.Symbols[EditorGUILayout.Popup(symbolIndex, script.SimonPlayer.Symbols)];
                 }
                 EditorGUILayout.EndHorizontal();
+                
+                // Actions
+                EditorGUILayout.Separator();
+                
+                GUILayout.Label("Actions scripts");
+
+                var types = AbstractDAS.GetDisplayerActionScripts();
+                var typeNames = new List<string>();
+                foreach (Type type in types)
+                    typeNames.Add(type.Name.Replace("DAS", ""));
+
+                EditorGUILayout.BeginHorizontal();
+                indexPopupAddDAS = EditorGUILayout.Popup(indexPopupAddDAS, typeNames.ToArray());
+                if (GUILayout.Button("Add", GUILayout.MaxWidth(40), GUILayout.Height(14)))
+                    script.ActionScripts.Add((AbstractDAS) ScriptableObject.CreateInstance(types[indexPopupAddDAS].Name));
+                EditorGUILayout.EndHorizontal();
+                
+                for (int i = 0, count = script.ActionScripts.Count; i < count; i++)
+                {
+                    var actionScript = script.ActionScripts[i];
+                    
+                    EditorGUILayout.BeginHorizontal();
+                    if (GUILayout.Button("x", GUILayout.MaxWidth(18), GUILayout.Height(14)))
+                    {
+                        script.ActionScripts.RemoveAt(i);
+                        i--;
+                        count--;
+                        continue;
+                    }
+                    GUILayout.Label(actionScript.GetActionScriptName());
+                    EditorGUILayout.EndHorizontal();
+                    CreateEditor(actionScript).OnInspectorGUI();
+                    
+                    EditorGUILayout.Separator();
+                }
+                
+                EditorGUILayout.Separator();
             }
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            DrawDefaultInspector();
         }
     }
 }

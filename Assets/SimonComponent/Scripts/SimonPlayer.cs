@@ -33,11 +33,10 @@ namespace SimonComponent
 		public static event Action OnPlaySequenceStop;
 		
 		public static event Action OnListenInputStart;
+		public static event Action OnInputReceived;
 		public static event Action OnListenInputStep;
 		public static event Action OnListenInputEndGreat;
 		public static event Action OnListenInputEndWrong;
-		
-		public static event Action OnCelebratingEnd;
 
 		#region MonoBehaviour
 		

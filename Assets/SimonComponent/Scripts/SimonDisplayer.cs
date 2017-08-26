@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using SimonComponent.ActionScripts;
 using UnityEngine;
 
 namespace SimonComponent
@@ -44,12 +45,25 @@ namespace SimonComponent
 		private int _listenedSymbolIndex;
 		public int ListenedSymbolIndex {get { return _listenedSymbolIndex; }}
 		
+		[SerializeField]
+		private List<AbstractDAS> _actionScripts = new List<AbstractDAS>();
+		public List<AbstractDAS> ActionScripts {get { return _actionScripts; }}
+
+		#region MonoBehaviour
+
 		void Start ()
+		{
+			LinkToPlayer();
+		}
+		
+		void Update ()
 		{
 			
 		}
 		
-		void Update ()
+		#endregion
+
+		protected void LinkToPlayer()
 		{
 			
 		}
