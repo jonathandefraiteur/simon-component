@@ -11,10 +11,19 @@ namespace SimonComponent
     // [CanEditMultipleObjects]
     public class SimonDisplayerEditor : Editor
     {
+        protected enum DrawActionEvent
+        {
+            None,
+            Remove,
+            MoveUp,
+            MoveDown
+        }
+        
         private int indexPopupAddDAS = 0;
         
         public override void OnInspectorGUI()
         {
+            var guiOriginalBackgroundColor = GUI.backgroundColor;
             SimonDisplayer script = (SimonDisplayer) target;
 
             // Simon Player
@@ -48,7 +57,7 @@ namespace SimonComponent
                 // Else, draw a popup of symbols
                 else
                 {
-                    EditorGUILayout.PrefixLabel("Symbol");
+                    EditorGUILayout.PrefixLabel("Listened symbol");
                     int symbolIndex = script.SimonPlayer.GetSymbolIndex(script.ListenedSymbol);
                     // Symbol (in string) not refound
                     if (symbolIndex < 0)
@@ -68,7 +77,33 @@ namespace SimonComponent
                 EditorGUILayout.Separator();
                 
                 GUILayout.Label("Actions scripts");
+                
+                // Actions : List
+                for (int i = 0, count = script.ActionScripts.Count; i < count; i++)
+                {
+                    var actionScript = script.ActionScripts[i];
+                    var actionEvent = DrawAction(actionScript);
+                    if (actionEvent == DrawActionEvent.Remove)
+                    {
+                        script.ActionScripts.RemoveAt(i);
+                    }
+                    else if (actionEvent == DrawActionEvent.MoveUp && i > 0)
+                    {
+                        script.ActionScripts.RemoveAt(i);
+                        script.ActionScripts.Insert(i - 1, actionScript);
+                    }
+                    else if (actionEvent == DrawActionEvent.MoveDown && i < count - 1)
+                    {
+                        script.ActionScripts.RemoveAt(i);
+                        script.ActionScripts.Insert(i + 1, actionScript);
+                    }
+                    if (actionEvent != DrawActionEvent.None)
+                    {
+                        break;
+                    }
+                }
 
+                // Actions : Add
                 var types = AbstractDAS.GetDisplayerActionScripts();
                 var typeNames = new List<string>();
                 foreach (Type type in types)
@@ -76,28 +111,11 @@ namespace SimonComponent
 
                 EditorGUILayout.BeginHorizontal();
                 indexPopupAddDAS = EditorGUILayout.Popup(indexPopupAddDAS, typeNames.ToArray());
-                if (GUILayout.Button("Add", GUILayout.MaxWidth(40), GUILayout.Height(14)))
+                GUI.backgroundColor = new Color(.5f, .9f, .3f);
+                if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.MaxWidth(23)))
                     script.ActionScripts.Add((AbstractDAS) ScriptableObject.CreateInstance(types[indexPopupAddDAS].Name));
+                GUI.backgroundColor = guiOriginalBackgroundColor;
                 EditorGUILayout.EndHorizontal();
-                
-                for (int i = 0, count = script.ActionScripts.Count; i < count; i++)
-                {
-                    var actionScript = script.ActionScripts[i];
-                    
-                    EditorGUILayout.BeginHorizontal();
-                    if (GUILayout.Button("x", GUILayout.MaxWidth(18), GUILayout.Height(14)))
-                    {
-                        script.ActionScripts.RemoveAt(i);
-                        i--;
-                        count--;
-                        continue;
-                    }
-                    GUILayout.Label(actionScript.GetActionScriptName());
-                    EditorGUILayout.EndHorizontal();
-                    CreateEditor(actionScript).OnInspectorGUI();
-                    
-                    EditorGUILayout.Separator();
-                }
                 
                 EditorGUILayout.Separator();
             }
@@ -107,6 +125,32 @@ namespace SimonComponent
             EditorGUILayout.Space();
             EditorGUILayout.Space();
             DrawDefaultInspector();
+        }
+
+        private DrawActionEvent DrawAction(AbstractDAS actionScript)
+        {
+            var guiOriginalBackgroundColor = GUI.backgroundColor;
+            
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+            // Title bar
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label(actionScript.GetActionScriptName(), EditorStyles.miniButtonLeft, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("▲", EditorStyles.miniButtonMid, GUILayout.MaxWidth(19))) return DrawActionEvent.MoveUp;
+            if (GUILayout.Button("▼", EditorStyles.miniButtonMid, GUILayout.MaxWidth(19))) return DrawActionEvent.MoveDown;
+            GUI.backgroundColor = new Color(1f, .4f, .4f);
+            if (GUILayout.Button("X", EditorStyles.miniButtonRight, GUILayout.MaxWidth(19))) return DrawActionEvent.Remove;
+            GUI.backgroundColor = guiOriginalBackgroundColor;
+            EditorGUILayout.EndHorizontal();
+            
+            // Body
+            EditorGUILayout.Separator();
+            CreateEditor(actionScript).OnInspectorGUI();
+
+            EditorGUILayout.Separator();
+            EditorGUILayout.EndVertical();
+
+            return DrawActionEvent.None;
         }
     }
 }
