@@ -44,10 +44,18 @@ namespace SimonComponent
 		}
 		private int _listenedSymbolIndex;
 		public int ListenedSymbolIndex {get { return _listenedSymbolIndex; }}
-		
+
+		[SerializeField]
+		private bool _listenPlaying = true;
+		public bool ListenPlaying {get { return _listenPlaying; } set { _listenPlaying = value; }}
+		[SerializeField]
+		private bool _listenSending = true;
+		public bool ListenSending {get { return _listenSending; } set { _listenSending = value; }}
+
+		public List<AbstractDAS> ActionScripts {get { return _actionScripts; }}
+
 		[SerializeField]
 		private List<AbstractDAS> _actionScripts = new List<AbstractDAS>();
-		public List<AbstractDAS> ActionScripts {get { return _actionScripts; }}
 
 		#region MonoBehaviour
 
