@@ -64,7 +64,8 @@ namespace SimonComponent
             
             EditorGUILayout.Space();
             
-            /* * / TODO: Remove this comments when editor is finish
+            /* * /
+            // TODO: Remove this comments when editor is finish
             EditorGUILayout.Space();
             EditorGUILayout.Space();
             EditorGUILayout.Space();

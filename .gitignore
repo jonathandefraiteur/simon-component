@@ -23,3 +23,7 @@ sysinfo.txt
 # JetBrain
 .idea/
 Assets/Plugins/Editor/JetBrains/
+
+Assets/ToDo/
+
+Assets/ToDo\.meta
