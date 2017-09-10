@@ -6,7 +6,8 @@ namespace SimonComponent.ActionScripts
 {
     public class EmissionColorChangeDAS : AbstractDAS
     {
-        public Color color;
+        public bool UseMaterialColor = true;
+        public Color Color = Color.white;
         
         public override string GetActionScriptName()
         {
@@ -15,7 +16,7 @@ namespace SimonComponent.ActionScripts
 
         public override void OnTurnOn(SimonDisplayer displayer)
         {
-            ChangeEmmisionColor(displayer, displayer.GetComponent<Renderer>().material.GetColor("_Color"));
+            ChangeEmmisionColor(displayer, UseMaterialColor ? displayer.GetComponent<Renderer>().material.GetColor("_Color") : Color);
         }
 
         public override void OnTurnOff(SimonDisplayer displayer)
@@ -25,7 +26,8 @@ namespace SimonComponent.ActionScripts
         
         protected void ChangeEmmisionColor(SimonDisplayer displayer, Color emissionColor)
         {
-            displayer.GetComponent<Renderer>().material.SetColor("_EmissionColor", emissionColor);
+            Renderer renderer = displayer.GetComponent<Renderer>();
+            if (renderer != null) renderer.material.SetColor("_EmissionColor", emissionColor);
         }
     }
 
@@ -36,7 +38,13 @@ namespace SimonComponent.ActionScripts
         {
             EmissionColorChangeDAS scriptableObject = (EmissionColorChangeDAS) target;
 
-            scriptableObject.color = EditorGUILayout.ColorField("Color", scriptableObject.color);
+            // Use material color
+            scriptableObject.UseMaterialColor =
+                EditorGUILayout.Toggle(new GUIContent("Use material color", "Use property _Color of the main material"), scriptableObject.UseMaterialColor);
+            // Color
+            GUI.enabled = !scriptableObject.UseMaterialColor;
+            scriptableObject.Color = EditorGUILayout.ColorField("Color", scriptableObject.Color);
+            GUI.enabled = true;
         }
     }
 }
