@@ -9,6 +9,8 @@ namespace SimonComponent
     [RequireComponent(typeof(SimonPlayer))]
     public class SimonManager : Singleton<SimonManager>
     {
+        private static bool applicationIsQuitting = false;
+        
         protected SimonManager() {} // guarantee this will be always a singleton only - can't use the constructor!
         
         public static SimonPlayer Player
@@ -21,10 +23,16 @@ namespace SimonComponent
             }
         }
 
-        private void Awake()
+        private void OnValidate()
         {
             // Make the instance linked
             var i = SimonManager.Instance;
+        }
+        
+        public new void OnDestroy()
+        {
+            if (!Application.isEditor)
+                applicationIsQuitting = true;
         }
     }
 }

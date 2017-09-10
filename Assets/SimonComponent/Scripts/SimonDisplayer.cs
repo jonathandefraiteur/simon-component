@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using SimonComponent.ActionScripts;
@@ -56,24 +57,103 @@ namespace SimonComponent
 
 		[SerializeField]
 		private List<AbstractDAS> _actionScripts = new List<AbstractDAS>();
+		
+		// Logic variables
+		private Coroutine _timedTurnOnCoroutine;
+
+		private delegate void SimonDisplayerEvent(SimonDisplayer displayer);
+		private event SimonDisplayerEvent OnTurnOn;
+		private event SimonDisplayerEvent OnTurnOff;
 
 		#region MonoBehaviour
 
-		void Start ()
+		protected void Start()
 		{
-			LinkToPlayer();
+			// If there is no SimonPlayer set to interact
+			if (SimonPlayer == null)
+			{
+				Debug.LogWarning(this.name + " disabled 'cause no SimonPlayer set to interact", this);
+				enabled = false;
+				return;
+			}
+			
+			LinkActionsScriptsToEvents();
 		}
 		
 		void Update ()
 		{
 			
 		}
-		
-		#endregion
 
-		protected void LinkToPlayer()
+		private void OnValidate()
 		{
-			
+			if (Application.isPlaying)
+			{
+				LinkActionsScriptsToEvents();
+			}
 		}
+
+		#endregion
+		#region Displayer Logic
+
+		protected void LinkActionsScriptsToEvents()
+		{
+			foreach (var actionScript in _actionScripts)
+			{
+				OnTurnOn += actionScript.OnTurnOn;
+				OnTurnOff += actionScript.OnTurnOff;
+			}
+		}
+
+		[ContextMenu("Turn ON")]
+		public void TurnOn()
+		{
+			TurnOn(float.PositiveInfinity);
+		}
+		
+		public void TurnOn(float duration, float delay = 0f)
+		{
+			// Stop actual coroutine if there is one
+			if (_timedTurnOnCoroutine != null)
+			{
+				StopCoroutine(_timedTurnOnCoroutine);
+				_timedTurnOnCoroutine = null;
+			}
+			// Simply turn on
+			if (float.IsPositiveInfinity(duration))
+			{
+				if (OnTurnOn != null) OnTurnOn(this);
+			}
+			// Call TimedturnOn to turn on during a given time
+			else
+			{
+				_timedTurnOnCoroutine = StartCoroutine(TimedTurnOn(duration, delay));
+			}
+		}
+
+		protected IEnumerator TimedTurnOn(float duration, float delay = 0f)
+		{
+			// In case of delay...
+			if (delay > 0) yield return new WaitForSeconds(delay);
+			// Then turn on during the duration time, then turn off
+			TurnOn();
+			yield return new WaitForSeconds(duration);
+			TurnOff();
+		}
+
+		[ContextMenu("Turn OFF")]
+		public void TurnOff()
+		{
+			// Stop actual coroutine if there is one
+			if (_timedTurnOnCoroutine != null)
+			{
+				StopCoroutine(_timedTurnOnCoroutine);
+				_timedTurnOnCoroutine = null;
+			}
+			// Emit an event
+			if (OnTurnOff != null) OnTurnOff(this);
+		}
+
+		#endregion
 	}
 }
