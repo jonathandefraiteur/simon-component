@@ -28,18 +28,22 @@ namespace SimonComponent
 		public delegate void SimonPlayerActionEvent();
 		public delegate void SimonPlayerSymbolEvent(string symbol);
 		
-		public static event SimonPlayerActionEvent OnPlaySequenceStart;
-		public static event SimonPlayerSymbolEvent OnPlaySequenceStep;
-		public static event SimonPlayerActionEvent OnPlaySequencePause;
-		public static event SimonPlayerActionEvent OnPlaySequenceResume;
-		public static event SimonPlayerActionEvent OnPlaySequenceEnd;
-		public static event SimonPlayerActionEvent OnPlaySequenceStop;
+		public event SimonPlayerActionEvent OnPlaySequenceStart;
+		public event SimonPlayerSymbolEvent OnPlaySequenceStep;
+		public event SimonPlayerActionEvent OnPlaySequencePause;
+		public event SimonPlayerActionEvent OnPlaySequenceResume;
+		public event SimonPlayerActionEvent OnPlaySequenceEnd;
+		public event SimonPlayerActionEvent OnPlaySequenceStop;
 		
-		public static event SimonPlayerActionEvent OnListenInputStart;
-		public static event SimonPlayerSymbolEvent OnInputReceived;
-		public static event SimonPlayerActionEvent OnListenInputStep;
-		public static event SimonPlayerActionEvent OnListenInputEndGreat;
-		public static event SimonPlayerActionEvent OnListenInputEndWrong;
+		public event SimonPlayerActionEvent OnListenInputStart;
+		public event SimonPlayerSymbolEvent OnInputReceived;
+		public event SimonPlayerActionEvent OnListenInputStep;
+		public event SimonPlayerActionEvent OnListenInputEndGreat;
+		public event SimonPlayerActionEvent OnListenInputEndWrong;
+		
+		// Coroutines
+		private Coroutine _playSequenceCoroutine;
+		private Coroutine _listenInputCoroutine;
 
 		#region MonoBehaviour
 		
@@ -70,17 +74,60 @@ namespace SimonComponent
 		#endregion
 		#region Simon Logic (Public)
 
+		[ContextMenu("Add symbol in sequence")]
+		string AddSymbolInSequence()
+		{
+			// Generate a new value, and add it
+			return AddSymbolInSequence(UnityEngine.Random.Range(0, Symbols.Length));
+		}
+		string AddSymbolInSequence(int newSymbolIndex)
+		{
+			// Add it in the serie
+			_sequence.Add(newSymbolIndex);
+			// Return the value just added
+			return Symbols[newSymbolIndex];
+		}
+
 		// Gameplay controls
-		void PlaySequence() {}
+		[ContextMenu("Play sequence")]
+		void PlaySequence()
+		{
+			PlaySequence(0f);
+		}
+		void PlaySequence(float delay)
+		{
+			_playSequenceCoroutine = StartCoroutine(PlaySequencCoroutine(delay));
+		}
+		[ContextMenu("Pause sequence")]
 		void PauseSequence() {}
+		[ContextMenu("Pause sequence")]
+		void ResumeSequence() {}
+		[ContextMenu("Stop sequence")]
 		void StopSequence() {}
 		
 		void StartListenInput() {}
 		void PauseListenInput() {}
+		void ResumeListenInput() {}
 		void StopListenInput() {}
 		void SendInput(int input) {}
 		void SendInput(string input) {}
 		
+		// Coroutines
+		protected IEnumerator PlaySequencCoroutine(float delay = 0f)
+		{
+			// _status = SimonStatus.Playing;
+			if (OnPlaySequenceStart != null) OnPlaySequenceStart();
+		
+			if (delay > 0) yield return new WaitForSeconds(delay);
+		
+			// For each input in serie
+			foreach (int symbolIndex in _sequence)
+			{
+				if (OnPlaySequenceStep != null) OnPlaySequenceStep(Symbols[symbolIndex]);
+				yield return new WaitForSeconds(_speed);
+			}
+			if (OnPlaySequenceEnd != null) OnPlaySequenceEnd();
+		}
 		
 		
 		#endregion

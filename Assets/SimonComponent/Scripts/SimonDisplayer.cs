@@ -137,7 +137,7 @@ namespace SimonComponent
 
 		protected void ListenSymbolToTurnOn(string symbol)
 		{
-			if (symbol == ListenedSymbol) TurnOn();
+			if (symbol == ListenedSymbol) TurnOn(.5f);
 		}
 
 		[ContextMenu("Turn ON")]
