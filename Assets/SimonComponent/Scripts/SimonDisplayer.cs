@@ -78,6 +78,7 @@ namespace SimonComponent
 			}
 			
 			LinkActionsScriptsToEvents();
+			LinkDisplayerToSimonPlayer();
 		}
 		
 		void Update ()
@@ -89,7 +90,11 @@ namespace SimonComponent
 		{
 			if (Application.isPlaying)
 			{
+				UnlinkActionsScriptsToEvents();
+				UnlinkDisplayerToSimonPlayer();
+				
 				LinkActionsScriptsToEvents();
+				LinkDisplayerToSimonPlayer();
 			}
 		}
 
@@ -103,6 +108,36 @@ namespace SimonComponent
 				OnTurnOn += actionScript.OnTurnOn;
 				OnTurnOff += actionScript.OnTurnOff;
 			}
+		}
+
+		protected void UnlinkActionsScriptsToEvents()
+		{
+			foreach (var actionScript in _actionScripts)
+			{
+				OnTurnOn -= actionScript.OnTurnOn;
+				OnTurnOff -= actionScript.OnTurnOff;
+			}
+		}
+
+		protected void LinkDisplayerToSimonPlayer()
+		{
+			if (SimonPlayer == null) return;
+			
+			if (ListenPlaying)
+				SimonPlayer.OnPlaySequenceStep += ListenSymbolToTurnOn;
+			if (ListenSending)
+				SimonPlayer.OnInputReceived += ListenSymbolToTurnOn;
+		}
+
+		protected void UnlinkDisplayerToSimonPlayer()
+		{
+			SimonPlayer.OnPlaySequenceStep -= ListenSymbolToTurnOn;
+			SimonPlayer.OnInputReceived -= ListenSymbolToTurnOn;
+		}
+
+		protected void ListenSymbolToTurnOn(string symbol)
+		{
+			if (symbol == ListenedSymbol) TurnOn();
 		}
 
 		[ContextMenu("Turn ON")]

@@ -25,18 +25,21 @@ namespace SimonComponent
 		[SerializeField] private int _symbolSend = -1;
 		
 		// Events
-		public static event Action OnPlaySequenceStart;
-		public static event Action OnPlaySequenceStep;
-		public static event Action OnPlaySequencePause;
-		public static event Action OnPlaySequenceResume;
-		public static event Action OnPlaySequenceEnd;
-		public static event Action OnPlaySequenceStop;
+		public delegate void SimonPlayerActionEvent();
+		public delegate void SimonPlayerSymbolEvent(string symbol);
 		
-		public static event Action OnListenInputStart;
-		public static event Action OnInputReceived;
-		public static event Action OnListenInputStep;
-		public static event Action OnListenInputEndGreat;
-		public static event Action OnListenInputEndWrong;
+		public static event SimonPlayerActionEvent OnPlaySequenceStart;
+		public static event SimonPlayerSymbolEvent OnPlaySequenceStep;
+		public static event SimonPlayerActionEvent OnPlaySequencePause;
+		public static event SimonPlayerActionEvent OnPlaySequenceResume;
+		public static event SimonPlayerActionEvent OnPlaySequenceEnd;
+		public static event SimonPlayerActionEvent OnPlaySequenceStop;
+		
+		public static event SimonPlayerActionEvent OnListenInputStart;
+		public static event SimonPlayerSymbolEvent OnInputReceived;
+		public static event SimonPlayerActionEvent OnListenInputStep;
+		public static event SimonPlayerActionEvent OnListenInputEndGreat;
+		public static event SimonPlayerActionEvent OnListenInputEndWrong;
 
 		#region MonoBehaviour
 		
