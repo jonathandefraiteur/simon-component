@@ -16,7 +16,13 @@ namespace SimonComponent.ActionScripts
 
         public override void OnTurnOn(SimonDisplayer displayer)
         {
-            ChangeEmmisionColor(displayer, UseMaterialColor ? displayer.GetComponent<Renderer>().material.GetColor("_Color") : Color);
+            if (UseMaterialColor)
+            {
+                Renderer renderer = displayer.GetComponent<Renderer>();
+                if (renderer == null) return;
+                Color = renderer.material.GetColor("_Color");
+            }
+            ChangeEmmisionColor(displayer, Color);
         }
 
         public override void OnTurnOff(SimonDisplayer displayer)
