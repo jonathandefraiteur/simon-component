@@ -120,6 +120,7 @@ namespace SimonComponent
 		
 			if (delay > 0) yield return new WaitForSeconds(delay);
 		
+			yield return new WaitForEndOfFrame();
 			// For each input in serie
 			foreach (int symbolIndex in _sequence)
 			{
