@@ -203,7 +203,7 @@ MonoBehaviour:
   - Left
   - Right
   - Down
-  _speed: 1
+  _speed: 0.5
   _sequence: 02000000000000000100000003000000020000000200000000000000010000000000000003000000
   _positionInSequence: -1
   _symbolSend: -1

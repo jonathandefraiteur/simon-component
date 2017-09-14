@@ -63,7 +63,8 @@ namespace SimonComponent
             }
             
             EditorGUILayout.Space();
-            
+            GUI.backgroundColor = _guiOriginalBackgroundColor;
+
             /* * /
             // TODO: Remove this comments when editor is finish
             EditorGUILayout.Space();
