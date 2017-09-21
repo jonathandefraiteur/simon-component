@@ -251,11 +251,11 @@ namespace SimonComponent
 				if (_status == PlayerStatus.Paused)
 					yield return new WaitWhile((() => _status == PlayerStatus.Paused));
 				// Play event
-				_positionInSequence++;
 				if (OnPlayingSequenceStep != null)
 					OnPlayingSequenceStep(Symbols[symbolIndex]);
 				// Wait before play another step
 				yield return new WaitForSeconds(_speed);
+				_positionInSequence++;
 			}
 			_status = PlayerStatus.Off;
 			if (OnPlayingSequenceEnd != null) OnPlayingSequenceEnd();
