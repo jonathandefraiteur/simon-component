@@ -124,14 +124,14 @@ namespace SimonComponent
 			if (SimonPlayer == null) return;
 			
 			if (ListenPlaying)
-				SimonPlayer.OnPlaySequenceStep += ListenSymbolToTurnOn;
+				SimonPlayer.OnPlayingSequenceStep += ListenSymbolToTurnOn;
 			if (ListenSending)
 				SimonPlayer.OnInputReceived += ListenSymbolToTurnOn;
 		}
 
 		protected void UnlinkDisplayerToSimonPlayer()
 		{
-			SimonPlayer.OnPlaySequenceStep -= ListenSymbolToTurnOn;
+			SimonPlayer.OnPlayingSequenceStep -= ListenSymbolToTurnOn;
 			SimonPlayer.OnInputReceived -= ListenSymbolToTurnOn;
 		}
 
