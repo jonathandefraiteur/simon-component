@@ -21,7 +21,7 @@ namespace SimonComponent
 			Listener
 		}
 		
-		public enum Status
+		public enum PlayerStatus
 		{
 			Off,
 			Running,
@@ -39,7 +39,7 @@ namespace SimonComponent
 			get { return _lockTheRunningMode; }
 			set
 			{
-				if (_lockTheRunningMode && value == false && _status != Status.Off)
+				if (_lockTheRunningMode && value == false && _status != PlayerStatus.Off)
 					throw new Exception("LockTheRunningMode security only can be disable when the player is Off.");
 				_lockTheRunningMode = value;
 			}
@@ -50,7 +50,7 @@ namespace SimonComponent
 			get { return _lockTheRunningSequence; }
 			set
 			{
-				if (_lockTheRunningSequence && value == false && _status != Status.Off)
+				if (_lockTheRunningSequence && value == false && _status != PlayerStatus.Off)
 					throw new Exception("LockTheRunningSequence security only can be disable when the player is Off.");
 				_lockTheRunningSequence = value;
 			}
@@ -64,14 +64,15 @@ namespace SimonComponent
 			get { return _mode; }
 			set
 			{
-				if (_lockTheRunningMode && _status != Status.Off && _mode != value)
+				if (_lockTheRunningMode && _status != PlayerStatus.Off && _mode != value)
 					throw new Exception("Unable to change the mode because of the LockTheRunningMode security.");
-				if (_status != Status.Off)
+				if (_status != PlayerStatus.Off)
 					Stop();
 				_mode = value;
 			}
 		}
-		[SerializeField] private Status _status = Status.Off;
+		[SerializeField] private PlayerStatus _status = PlayerStatus.Off;
+		public PlayerStatus Status {get { return _status; }}
 		[SerializeField] private List<int> _sequence = new List<int>();
 		public int[] Sequence { get { return _sequence.ToArray(); }}
 		[SerializeField] private int _positionInSequence = -1;
@@ -136,7 +137,7 @@ namespace SimonComponent
 		public string AddSymbolInSequence(int newSymbolIndex)
 		{
 			// Check security
-			if (_lockTheRunningSequence && _status != Status.Off)
+			if (_lockTheRunningSequence && _status != PlayerStatus.Off)
 				throw new Exception("Unable to edit the sequence when it's played (even if paused) because of the LockTheRunningSequence security.");
 			// Add it in the serie
 			_sequence.Add(newSymbolIndex);
@@ -147,7 +148,7 @@ namespace SimonComponent
 		public void ClearSymbolSequence()
 		{
 			// Check security
-			if (_lockTheRunningSequence && _status != Status.Off)
+			if (_lockTheRunningSequence && _status != PlayerStatus.Off)
 				throw new Exception("Unable to clear the sequence when it's played (even paused) because of the LockTheRunningSequence security.");
 			_sequence.Clear();
 		}
@@ -168,7 +169,7 @@ namespace SimonComponent
 		public void Run(float delay = 0f)
 		{
 			// TODO:  Think about the most logic, restart or forbid the new run
-			if (_status != Status.Off)
+			if (_status != PlayerStatus.Off)
 				Stop();
 			switch (_mode)
 			{
@@ -185,20 +186,20 @@ namespace SimonComponent
 		
 		public void Pause()
 		{
-			if (_status != Status.Running) return;
-			_status = Status.Paused;
+			if (_status != PlayerStatus.Running) return;
+			_status = PlayerStatus.Paused;
 		}
 		
 		public void Resume()
 		{
-			if (_status != Status.Paused) return;
-			_status = Status.Running;
+			if (_status != PlayerStatus.Paused) return;
+			_status = PlayerStatus.Running;
 		}
 
 		public void Stop()
 		{
-			if (_status == Status.Off) return;
-			_status = Status.Off;
+			if (_status == PlayerStatus.Off) return;
+			_status = PlayerStatus.Off;
 			_positionInSequence = -1;
 			_symbolSend = -1;
 		}
@@ -210,7 +211,7 @@ namespace SimonComponent
 				Debug.LogWarning("Trying to send input out of Listener mode");
 				return;
 			}
-			if (_status != Status.Running)
+			if (_status != PlayerStatus.Running)
 			{
 				Debug.Log("Input ignored because the player is not running");
 				return;
@@ -235,7 +236,7 @@ namespace SimonComponent
 		protected IEnumerator PlaySequenceCoroutine(float delay = 0f)
 		{
 			_mode = PlayerMode.Player;
-			_status = Status.Running;
+			_status = PlayerStatus.Running;
 			_positionInSequence = 0;
 		
 			if (delay > 0) yield return new WaitForSeconds(delay);
@@ -247,8 +248,8 @@ namespace SimonComponent
 			foreach (int symbolIndex in _sequence)
 			{
 				// Handle pause
-				if (_status == Status.Paused)
-					yield return new WaitWhile((() => _status == Status.Paused));
+				if (_status == PlayerStatus.Paused)
+					yield return new WaitWhile((() => _status == PlayerStatus.Paused));
 				// Play event
 				_positionInSequence++;
 				if (OnPlayingSequenceStep != null)
@@ -256,14 +257,14 @@ namespace SimonComponent
 				// Wait before play another step
 				yield return new WaitForSeconds(_speed);
 			}
-			_status = Status.Off;
+			_status = PlayerStatus.Off;
 			if (OnPlayingSequenceEnd != null) OnPlayingSequenceEnd();
 		}
 		
 		protected IEnumerator ListenInputCoroutine(float delay = 0f)
 		{
 			_mode = PlayerMode.Listener;
-			_status = Status.Running;
+			_status = PlayerStatus.Running;
 			_positionInSequence = 0;
 		
 			if (delay > 0) yield return new WaitForSeconds(delay);
@@ -272,8 +273,8 @@ namespace SimonComponent
 			while (true)
 			{
 				// Handle pause
-				if (_status == Status.Paused)
-					yield return new WaitWhile((() => _status == Status.Paused));
+				if (_status == PlayerStatus.Paused)
+					yield return new WaitWhile((() => _status == PlayerStatus.Paused));
 				// Wait the reception of a symbol
 				yield return new WaitUntil(() => _symbolSend >= 0);
 				// If the input is correct
@@ -289,7 +290,7 @@ namespace SimonComponent
 					}
 					else
 					{
-						_status = Status.Off;
+						_status = PlayerStatus.Off;
 						if (OnListenInputEndGreat != null) OnListenInputEndGreat();
 						break;
 					}
@@ -297,7 +298,7 @@ namespace SimonComponent
 				// Wrong input
 				else
 				{
-					_status = Status.Off;
+					_status = PlayerStatus.Off;
 					if (OnListenInputEndWrong != null) OnListenInputEndWrong();
 					// Error "Celebrating
 					// _mode = SimonStatus.Celebrating;
