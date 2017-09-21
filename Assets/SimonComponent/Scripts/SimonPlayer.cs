@@ -199,6 +199,11 @@ namespace SimonComponent
 		public void Stop()
 		{
 			if (_status == PlayerStatus.Off) return;
+			if (_currentCoroutine != null)
+			{
+				StopCoroutine(_currentCoroutine);
+				_currentCoroutine = null;
+			}
 			_status = PlayerStatus.Off;
 			_positionInSequence = -1;
 			_symbolSend = -1;
