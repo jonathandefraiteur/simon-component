@@ -66,9 +66,11 @@ namespace SimonComponent
 			{
 				if (_lockTheRunningMode && _status != PlayerStatus.Off && _mode != value)
 					throw new Exception("Unable to change the mode because of the LockTheRunningMode security.");
-				if (_status != PlayerStatus.Off)
+				if (_status != PlayerStatus.Off && _mode != value)
+				{
 					Stop();
-				_mode = value;
+					_mode = value;
+				}
 			}
 		}
 		[SerializeField] private PlayerStatus _status = PlayerStatus.Off;
