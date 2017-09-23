@@ -29,15 +29,18 @@ namespace SimonComponent
 			GUI.enabled = Application.isPlaying;
 			GUILayout.Label("Player", EditorStyles.boldLabel);
 			DrawPlayer(ref script);
+			DrawSequenceBar(script);
 			GUI.enabled = true;
 			
 			// Configuration
 			GUILayout.Label("Configuration", EditorStyles.boldLabel);
 			DrawConfiguration(ref script);
 			
+			/*
 			// Sequence
 			GUILayout.Label("Sequence", EditorStyles.boldLabel);
 			DrawSequence(ref script);
+			*/
 			
 			// Default inspector
 			EditorGUILayout.Space();
@@ -61,12 +64,28 @@ namespace SimonComponent
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 		}
-		
-		protected void DrawSequence(ref SimonPlayer script)
+
+		protected void DrawSequenceBar(SimonPlayer script)
 		{
 			// Progress
-			GUILayout.HorizontalSlider(script.PositionInSequence, 0, script.Sequence.Length - 1);
-			
+			Rect r = EditorGUILayout.BeginHorizontal(GUILayout.Height(20));
+			string progressText;
+			// Not running
+			if (script.PositionInSequence >= script.Sequence.Length)
+				progressText = "Completed";
+			else if (script.PositionInSequence >= 0)
+				progressText = "Symbol " + (script.PositionInSequence + 1) + " / " + script.Sequence.Length;
+			else
+				progressText = script.Sequence.Length + " symbols in the sequence";
+			EditorGUI.ProgressBar(r, script.PositionInSequence * 1f / script.Sequence.Length * 1f, progressText);
+			if (script.PositionInSequence >= 0 && script.PositionInSequence < script.Sequence.Length)
+				GUILayout.Label(script.Symbols[script.Sequence[script.PositionInSequence]], EditorStyles.helpBox);
+			GUILayout.FlexibleSpace();
+			EditorGUILayout.EndHorizontal();
+		}
+
+		protected void DrawSequence(ref SimonPlayer script)
+		{	
 			// Sequence
 			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
